@@ -28,89 +28,14 @@ if (designated_month > 12 || designated_month < 1) {
 const month_english_list = ["January", "February", "March", "April", "May", "Jun", "July", "August", "September", "October", "November", "December"];
 const month_english = month_english_list[designated_month - 1];
 
-// 最初に改行する場所を指定する
-const turn = first_turn_place(designated_month);
-
-// 月毎に1日目の前に挿入するスペースの数を各月の1日目をベースに決定する
-function check_first_date2(i) {
-  // 日曜日の場合
-  if (i.getDay() === 0) {
-    return "";
-  // 月曜日の場合
-  } else if (i.getDay() === 1) {
-    return " ".repeat(3);
-  // 火曜日の場合
-  } else if (i.getDay() === 2) {
-    return " ".repeat(6);
-  // 水曜日の場合
-  } else if (i.getDay() === 3) {
-    return " ".repeat(9);
-  // 木曜日の場合
-  } else if (i.getDay() === 4) {
-    return " ".repeat(12);
-  // 金曜日の場合
-  } else if (i.getDay() === 5) {
-    return " ".repeat(15);
-  // 土曜日の場合
-  } else if (i.getDay() === 6) {
-    return " ".repeat(18);
-  }
+// 初日の前に挿入するスペースの数を各月の1日目の曜日をベースに決定する。曜日ごとに半角スペース3つずつずれる
+function check_first_date3(i) {
+  return "   ".repeat(i.getDay());
 }
 
-// 月毎に1日目の前に挿入するスペースの数を決定する
-// function check_first_date(i) {
-//   if (i === 1 || i === 10) {
-//     // 半角スペースが9個
-//     return " ".repeat(9);
-//   } else if (i === 2 || i === 3 || i === 11) {
-//     // 半角スペースが18個
-//     return " ".repeat(18);
-//   } else if (i === 5) {
-//     // 半角スペースが12個
-//     return " ".repeat(12);
-//   } else if (i === 4 || i === 7) {
-//     // 半角スペースが6個
-//     return " ".repeat(6);
-//   } else if (i === 8) {
-//     // 半角スペースが15個
-//     return " ".repeat(15);
-//   } else if (i === 9 || i === 12) {
-//     // 半角スペースが3個
-//     return " ".repeat(3);
-//   } else {
-//     // 半角スペースが0個
-//     return "";
-//   }
-// }
-
-// 月毎に1回目の改行をどこで挿入するかを決定する
-function first_turn_place(i) {
-  if (i === 1 || i === 10) {
-    return 3;
-  } else if (i === 2 || i === 3 || i === 11) {
-    return 0;
-  } else if (i === 4 || i === 7) {
-    return 4;
-  } else if (i === 5) {
-    return 2;
-  } else if (i === 8) {
-    return 1;
-  } else if (i === 9 || i === 12) {
-    return 5;
-  } else {
-    return 6;
-  }
-}
-
-// 月毎に最終日の日付を決定する
-function check_last_date(n) {
-  if (n === 2) {
-    return 28;
-  } else if (n === 4 || n === 6 || n === 9 || n === 11) {
-    return 30;
-  } else {
-    return 31;
-  };
+// 引数から得た月の最終日を取得する
+const getLastDayMonth = (year, month) => {
+  return new Date(year, month, 0).getDate();
 }
 
 // 初日から最終日までの日付を配列に入れて1ヶ月間の日付を作る。引数に月の最終日を入れる
@@ -122,46 +47,15 @@ function make_dates(m) {
   return dates;
 }
 
-// // 改行場所を１回目から４回目まで確認する。最初の改行箇所(turn)から7個✖️n(0〜4)が改行場所となる。改行する場合はbreakでfor文を抜ける
-// function times(number) {
-//   for (let t = 0; t < 5; t++) {
-//     if (turn + 7 * t === number) {
-//       process.stdout.write("\n");
-//       break;
-//     }
-//   }
-// }
-
-// 出力する日付を引数に取り、曜日の確認をする。土曜日の場合は日付を出力した後に改行を入れる
-function check_day(number) {
-  let date = new Date(2025, (designated_month - 1), number);
-  // toLocalStringはオブジェクトを文字列に変換するので、再度Date型に変換し直す
-  let the_date = new Date(date.toLocaleString('ja-JP', {timeZone: 'Asia/Tokyo'}));
-  let day = the_date.getDay();
-  if (day === 6) {
-    process.stdout.write("\n");
-  }
-}
-
-// 配列に入った日付のデータを出力する。process.stdout.writeは改行無しで出力できるが、引数は文字列限定となる。
-function output_dates(dates) {
-  // 最初の改行場所を定義
+// 日付の出力。1桁であれば頭に半角スペースを補う。出力する日付の曜日が土曜日(6)ならば改行、違えば日付の後ろに半角スペース出力
+function output_dates2(dates) {
   for (let i = 0; i < dates.length; i++ ) {
-    // 日付が1桁で且つ9日ではない場合
-    if (String(dates[i]).length === 1 && dates[i] !== 9) {
-      process.stdout.write(" " + String(dates[i]) + " "); 
-      // times(i);
-      check_day(dates[i]);
-    // 日付が2桁で且つ月曜日の場合は頭のスペースを入れない
-    } else if (String(dates[i]).length === 2 && (turn + 8 === i || turn + 15 === i || turn + 22 === i || turn + 29 === i) ) {
-      process.stdout.write(String(dates[i]));
-      // times(i);
-      check_day(dates[i]);
-    // 日付が9日、若しくは2桁の場合は頭にスペースを入れる
+    process.stdout.write(String(dates[i]).padStart(2, " "));
+    let date = new Date(2025, designated_month - 1, dates[i]);
+    if (date.getDay() !== 6) {
+      process.stdout.write(" ");
     } else {
-      process.stdout.write(" " + String(dates[i]));
-      // times(i);
-      check_day(dates[i]);
+      process.stdout.write("\n");
     }
   }
 }
@@ -169,12 +63,12 @@ function output_dates(dates) {
 console.log("  ", month_english, String(now.getFullYear()));
 console.log("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa");
 // 1日目を出力する前に挿入するスペース
-const first_date_space = check_first_date2(first_date);
+const first_date_space = check_first_date3(first_date);
 // 該当月の最終日
-const last_date = check_last_date(designated_month);
+const last_date = getLastDayMonth(2025, designated_month);
 //生成した月内全ての日付
 const all_dates = make_dates(last_date);
 process.stdout.write(first_date_space);
-output_dates(all_dates);
+output_dates2(all_dates);
 // 出力の末尾に % が入ってしまうので、改行をすることで出力されないようにする
 process.stdout.write("\n");
